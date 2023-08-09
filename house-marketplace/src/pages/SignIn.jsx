@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth"
 import { ReactComponent as ArrowRightIcon } from "../assets/svg/keyboardArrowRightIcon.svg"
 import visibilityIcon from "../assets/svg/visibilityIcon.svg"
 
@@ -20,43 +21,59 @@ function SignIn() {
     }))
   }
 
-    return (
-      <>
-          <div className="pageContainer">
-            <header>
-              <p className="pageHeader">Welcome Back!</p>
-            </header>
+  const onSubmit = async (e) => {
+    e.preventDefault()
 
-            <form>
-              <input type="email" placeholder="Email" id="email" className="emailInput" value={email} onChange={onChange}/>
+    try {
+      const auth = getAuth()
 
-              <div className="passwordInputDiv">
-                <input type={showPassword ? "text" : "password"} className="passwordInput" id="password" placeholder="Password" value={password} onChange={onChange}/>
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
 
-                <img src={visibilityIcon} alt="show password" className="showPassword" onClick={() => setShowPassword((prevState) => !prevState)}/>
-              </div>
+      if(userCredential.user) {
+        navigate('/')
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-              <Link to='/forgot-password' className="forgotPasswordLink">
-                Forgot Password
-              </Link>
-              
-              <div className="signInBar">
-                <p className="signInText">
-                  Sign In
-                </p>
-                <button className="signInButton">
-                  <ArrowRightIcon fill='#ffffff' width='34px' height='34px' />
-                </button>
-              </div>
-            </form>
+  return (
+    <>
+      <div className="pageContainer">
+        <header>
+          <p className="pageHeader">Welcome Back!</p>
+        </header>
 
-            {/* Google OAuth */}
+        <form onSubmit={onSubmit}>
+          <input type="email" placeholder="Email" id="email" className="emailInput" value={email} onChange={onChange}/>
 
-            <Link to='/sign-up' className="registerLink">
-              Sign Up Instead
-            </Link>
+          <div className="passwordInputDiv">
+            <input type={showPassword ? "text" : "password"} className="passwordInput" id="password" placeholder="Password" value={password} onChange={onChange}/>
+
+            <img src={visibilityIcon} alt="show password" className="showPassword" onClick={() => setShowPassword((prevState) => !prevState)}/>
           </div>
-      </>
+
+          <Link to='/forgot-password' className="forgotPasswordLink">
+            Forgot Password
+          </Link>
+          
+          <div className="signInBar">
+            <p className="signInText">
+              Sign In
+            </p>
+            <button className="signInButton">
+              <ArrowRightIcon fill='#ffffff' width='34px' height='34px' />
+            </button>
+          </div>
+        </form>
+
+        {/* Google OAuth */}
+
+        <Link to='/sign-up' className="registerLink">
+          Sign Up Instead
+        </Link>
+      </div>
+    </>
     )
   }
   
